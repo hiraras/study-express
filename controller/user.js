@@ -1,6 +1,6 @@
 
 const { exec, escape } = require('../db/mysql');
-const { genPassword } = require('../../common/utils');
+const { genPassword } = require('../utils/cryp');
 
 const login = (postData = { username: '', password: '' }) => {
   const username = escape(postData.username);
@@ -12,7 +12,7 @@ const login = (postData = { username: '', password: '' }) => {
   `;
   return exec(sql).then(result => {
     if (result && result.length) {
-      return Promise.resolve(result);
+      return Promise.resolve(result[0]);
     } else {
       return Promise.reject('user account not matched');
     }
