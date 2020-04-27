@@ -15,4 +15,14 @@ router.post('/login', (req, res, next) => {
   });
 });
 
+router.get('/logout', (req, res, next) => {
+  if (req.session.username) {
+    req.session.username = null;
+    req.session.realname = null;
+    res.json(new SuccessModel());
+  } else {
+    res.json(new ErrorModel());
+  }
+});
+
 module.exports = router;

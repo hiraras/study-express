@@ -28,10 +28,8 @@ const newBlog = (data = {}) => {
     values ('${title}', '${content}', ${Date.now()}, '${data.author}');
   `;
   return exec(sql).then(insertData => {
-    if (insertData.affectedRows === 1) {
-      return Promise.resolve({
-        id: insertData.insertId
-      });
+    if (updateResult.affectedRows > 0) {
+      return Promise.resolve({ id: insertData.insertId });
     } else {
       return Promise.reject('fail to add new blog');
     }
@@ -40,17 +38,19 @@ const newBlog = (data = {}) => {
   });
 }
 
-const updateBlog = (id, data) => {
+const updateBlog = (data) => {
   const title = xss(data.title);
   const content = xss(data.content);
+  const id = data.id;
+  const author = data.author;
   let sql = `
-    update blogs set title='${title || ''}', content='${content || ''}' where id=${id || ''};
+    update blogs set title='${title || ''}', content='${content || ''}' where id=${id || ''} and author = '${author || ''}';
   `;
   return exec(sql).then(updateResult => {
     if (updateResult.affectedRows > 0) {
       return Promise.resolve({ id });
     } else {
-      return Promise.reject('fail to add new blog');
+      return Promise.reject('fail to update blog');
     }
   }).catch(err => {
     return Promise.reject(err);

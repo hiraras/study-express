@@ -44,10 +44,10 @@
 		}
 		.time {
 			color: #333;
-        }
-        .edit {
-            cursor: pointer;
-        }
+		}
+		.operation {
+				cursor: pointer;
+		}
 	</style>
 </head>
 
@@ -65,10 +65,13 @@
 		search();
 		$('#ctn').on('click', '.title', function () {
 			window.location.href = '/detail.html?id=' + $(this).closest('.item').attr('blog-id');
-        });
-        $('#ctn').on('click', '.edit', function () {
+		});
+		$('#ctn').on('click', '.edit', function () {
 			window.location.href = '/edit.html?id=' + $(this).closest('.item').attr('blog-id');
-        });
+		});
+		$('#ctn').on('click', '.del', function () {
+			delBlog($(this).closest('.item').attr('blog-id'));
+		});
 	});
 	$('#search').on('click', function () {
 		const keyword = $('#keyword').val();
@@ -104,13 +107,17 @@
 			$title.append(elem.title);
 			const $time = $('<span></span>');
 			$time.addClass('time');
-            $time.text(formatTime(elem.createtime));
-            const $editBtn = $('<a></a>');
-            $editBtn.text('编辑');
-            $editBtn.addClass('edit');
-            $elem.append($title);
-            $elem.append($time);
-            $elem.append($editBtn);
+			$time.text(formatTime(elem.createtime));
+			const $editBtn = $('<a></a>');
+			$editBtn.text('编辑');
+			$editBtn.addClass('operation edit');
+			const $delBtn = $('<a></a>');
+			$delBtn.text('删除');
+			$delBtn.addClass('operation del');
+			$elem.append($title);
+			$elem.append($time);
+			$elem.append($editBtn);
+			$elem.append($delBtn);
 			$ctn.append($elem);
 		});
 	}
@@ -131,6 +138,26 @@
 			type: 'GET',
 			success: function (result) {
 				createElem(result.data);
+			},
+			error: function (err) {
+				console.log(err);
+			}
+		});
+	}
+
+	function delBlog(id) {
+		if (!id) {
+			alert('获取id失败');
+			return ;
+		}
+		$.ajax({
+			async: true,
+			url: '/api/blog/del/' + id,
+			cache: false,
+			dataType: 'json', // 返回数据的数据类型
+			type: 'DELETE',
+			success: function (result) {
+				search();
 			},
 			error: function (err) {
 				console.log(err);
