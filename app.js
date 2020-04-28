@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const fs = require('fs');
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 
@@ -10,6 +11,20 @@ const RedisStore = require('connect-redis')(session);
 // var usersRouter = require('./routes/users');
 const blogRouter = require('./routes/blog');
 const userRouter = require('./routes/user');
+const logFilePath = path.join(__dirname, './logs', './assess.log');
+const logWriteStream = fs.createWriteStream(logFilePath, {
+  flags: 'a'
+});
+
+function getLogFormat() {
+  const env = process.env.NODE_ENV;
+  if (env === 'dev') {
+    return 'dev';
+  }
+  if (env === 'prod') {
+    return 'combined';
+  }
+}
 
 var app = express();
 
@@ -17,7 +32,9 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(logger('dev'));
+app.use(logger(getLogFormat(), {
+  stream: logWriteStream
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

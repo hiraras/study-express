@@ -11,8 +11,12 @@ const {
 } = require('../controller/blog');
 
 router.get('/list', loginCheck, function(req, res, next) {
-  const { author = '', keyword = '' } = req.query;
-  return getList(author, keyword).then(result => {
+  const { keyword = '', isAdmin = false } = req.query;
+  let { author = '' } = req.query;
+  if (isAdmin) {
+    author = req.session.username;
+  }
+  return getList(author, keyword, isAdmin).then(result => {
     res.json(new SuccessModel(result));
   }).catch(err => {
     res.json(new ErrorModel(err));
